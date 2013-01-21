@@ -1,6 +1,12 @@
 LOCAL_PATH:= $(call my-dir)
 include $(CLEAR_VARS)
 
+ifeq ($(BOARD_USES_ALSA_AUDIO),true)
+    ifeq ($(call is-chipset-in-board-platform,msm8960),true)
+        LOCAL_CFLAGS += -DUSE_TUNNEL_MODE
+    endif
+endif
+
 include frameworks/av/media/libstagefright/codecs/common/Config.mk
 
 LOCAL_SRC_FILES:=                         \
@@ -62,7 +68,35 @@ LOCAL_C_INCLUDES:= \
         $(TOP)/frameworks/native/include/media/hardware \
         $(TOP)/external/flac/include \
         $(TOP)/external/tremolo \
-        $(TOP)/external/openssl/include \
+        $(TOP)/external/openssl/include
+
+ifneq ($(DOMX_PATH),)
+LOCAL_C_INCLUDES += $(DOMX_PATH)/omx_core/inc
+ifeq ($(BOARD_USE_TI_ENHANCED_DOMX),true)
+LOCAL_CPPFLAGS += -DTI_ENHANCED_DOMX
+endif
+else
+LOCAL_C_INCLUDES += $(TOP)/frameworks/native/include/media/openmax
+endif
+
+ifeq ($(BOARD_USES_QCOM_HARDWARE),true)
+LOCAL_SRC_FILES += \
+        ExtendedWriter.cpp                \
+        QCMediaDefs.cpp                   \
+        QCOMXCodec.cpp                    \
+        WAVEWriter.cpp                    \
+        ExtendedExtractor.cpp
+
+LOCAL_C_INCLUDES += \
+        $(TOP)/hardware/qcom/media/mm-core/inc
+
+ifeq ($(TARGET_QCOM_AUDIO_VARIANT),caf)
+LOCAL_CFLAGS += -DQCOM_ENHANCED_AUDIO
+LOCAL_SRC_FILES += \
+        LPAPlayerALSA.cpp                 \
+        TunnelPlayer.cpp
+endif
+endif
 
 ifdef ENHANCED_DOMX
 LOCAL_C_INCLUDES += $(DOMX_PATH)/omx_core/inc

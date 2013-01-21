@@ -31,9 +31,10 @@
 #include <utils/String8.h>
 #include <cutils/properties.h>
 
-#ifdef ENHANCED_DOMX
+#ifdef TI_ENHANCED_DOMX
 #include <OMX_TI_IVCommon.h>
 #endif
+
 namespace android {
 
 static const int64_t CAMERA_SOURCE_TIMEOUT_NS = 3000000000LL;
@@ -108,7 +109,11 @@ static int32_t getColorFormat(const char* colorFormat) {
     }
 
     if (!strcmp(colorFormat, CameraParameters::PIXEL_FORMAT_YUV422I)) {
+#if defined(TARGET_OMAP3) && defined(OMAP_ENHANCEMENT)
+        return OMX_COLOR_FormatCbYCrY;
+#else
         return OMX_COLOR_FormatYCbYCr;
+#endif
     }
 
     if (!strcmp(colorFormat, CameraParameters::PIXEL_FORMAT_RGB565)) {
