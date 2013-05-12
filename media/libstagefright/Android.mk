@@ -3,6 +3,10 @@ include $(CLEAR_VARS)
 
 include frameworks/av/media/libstagefright/codecs/common/Config.mk
 
+ifeq ($(BOARD_HTC_3D_SUPPORT),true)
+   LOCAL_CFLAGS += -DHTC_3D_SUPPORT
+endif
+
 LOCAL_SRC_FILES:=                         \
         ACodec.cpp                        \
         AACExtractor.cpp                  \
@@ -56,6 +60,11 @@ LOCAL_SRC_FILES:=                         \
         avc_utils.cpp                     \
         mp4/FragmentedMP4Parser.cpp       \
         mp4/TrackFragment.cpp             \
+
+ifeq ($(BOARD_HAVE_QCOM_FM),true)
+LOCAL_SRC_FILES+=                         \
+        FMA2DPWriter.cpp
+endif
 
 LOCAL_C_INCLUDES:= \
         $(TOP)/frameworks/av/include/media/stagefright/timedtext \
